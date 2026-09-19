@@ -27,6 +27,7 @@ import entityClasses.User;
  * @version 2.00		2025-04-29 Updated and expanded from the version produce by Pravalika 
  * 							Mukkiri and Ishwarya Hidkimath Basavaraj
  * @version 2.01		2025-12-17 Minor updates for Spring 2026
+ * @version 2.02        2026-09-16 Added one time password storage and password update
  */
 
 /*
@@ -60,7 +61,8 @@ public class Database {
 	private boolean currentAdminRole;
 	private boolean currentNewRole1;
 	private boolean currentNewRole2;
-
+	private boolean currentOneTimePasswordFlag;
+	private String currentOneTimePassword;
 	/*******
 	 * <p> Method: Database </p>
 	 * 
@@ -88,7 +90,7 @@ public class Database {
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
 			statement = connection.createStatement(); 
 			// You can use this command to clear the database and restart from fresh.
-			//statement.execute("DROP ALL OBJECTS");
+			statement.execute("DROP ALL OBJECTS");
 
 			createTables();  // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {
@@ -116,7 +118,9 @@ public class Database {
 				+ "emailAddress VARCHAR(255), "
 				+ "adminRole BOOL DEFAULT FALSE, "
 				+ "newRole1 BOOL DEFAULT FALSE, "
-				+ "newRole2 BOOL DEFAULT FALSE)";
+				+ "newRole2 BOOL DEFAULT FALSE, "
+				+ "oneTimePassword VARCHAR(255) DEFAULT NULL, "
+				+ "oneTimePasswordFlag BOOL DEFAULT FALSE)";
 		statement.execute(userTable);
 		
 		// Create the invitation codes table
@@ -126,7 +130,6 @@ public class Database {
 	            + "role VARCHAR(10))";
 	    statement.execute(invitationCodesTable);
 	}
-
 
 /*******
  * <p> Method: isDatabaseEmpty </p>
@@ -404,6 +407,59 @@ public class Database {
 	    }
 	    return code;
 	}
+	
+    /*******
+     * <p> Method: String setOneTimePassword(String username) </p>
+     *
+     * <p> Description: Given a username, this method generates a one time password, stores it in
+     * that user's row, and sets the flag stating that the password is outstanding. The admin gives the
+     * returned value to the user who forgot their password. When it is used, the login page
+     * requires the user to create a new password and then the one time password is cleared.</p>
+     *
+     * @param username specifies the user who forgot their password.
+     *
+     * @return the one time password of eight characters, or null if the update failed.
+     *
+     */
+    // Generates a new one time password and stores it for the specified user.
+    public String setOneTimePassword(String username) {
+            String oneTimePassword = UUID.randomUUID().toString().substring(0, 6);
+            String query = "UPDATE userDB SET oneTimePassword = ?, oneTimePasswordFlag = TRUE "
+                            + "WHERE userName = ?";
+            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                    pstmt.setString(1, oneTimePassword);
+                    pstmt.setString(2, username);
+                    pstmt.executeUpdate();
+                    return oneTimePassword;
+            } catch (SQLException e) {
+                    e.printStackTrace();
+                    return null;
+            }
+    }
+    
+    /*******
+     * <p> Method: void clearOneTimePassword(String username) </p>
+     *
+     * <p> Description: Given a username, this method removes that user's one time password and
+     * clears the flag. This is called right after the one time password has been used to
+     * establish a new password, so the same one time password cannot be used twice.</p>
+     *
+     * @param username specifies the user whose one time password is being cleared.
+     *
+     */
+    // Removes the one time password for the specified user after it has been used.
+    public void clearOneTimePassword(String username) {
+            String query = "UPDATE userDB SET oneTimePassword = NULL, oneTimePasswordFlag = FALSE "
+                            + "WHERE userName = ?";
+            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                    pstmt.setString(1, username);
+                    pstmt.executeUpdate();
+                    currentOneTimePassword = null;
+                    currentOneTimePasswordFlag = false;
+            } catch (SQLException e) {
+                    e.printStackTrace();
+            }
+    }
 
 	
 	/*******
@@ -752,7 +808,30 @@ public class Database {
 	    }
 	}
 	
-	
+    /*******
+     * <p> Method: void updatePassword(String username, String password) </p>
+     *
+     * <p> Description: Update the password of a user when given the username and new
+     *              password.</p>
+     *
+     * @param username is the username of the user
+     *
+     * @param password is the new password for the user
+     *
+     */
+    // update the password of the user
+    public void updatePassword(String username, String password) {
+        String query = "UPDATE userDB SET password = ? WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, password);
+            pstmt.setString(2, username);
+            pstmt.executeUpdate();
+            currentPassword = password;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
 	/*******
 	 * <p> Method: String getEmailAddress(String username) </p>
 	 * 
@@ -833,6 +912,8 @@ public class Database {
 	    	currentAdminRole = rs.getBoolean(9);
 	    	currentNewRole1 = rs.getBoolean(10);
 	    	currentNewRole2 = rs.getBoolean(11);
+	    	currentOneTimePassword = rs.getString("oneTimePassword");
+	    	currentOneTimePasswordFlag = rs.getBoolean("oneTimePasswordFlag");
 			return true;
 	    } catch (SQLException e) {
 			return false;
@@ -1015,7 +1096,29 @@ public class Database {
 	 *  
 	 */
 	public boolean getCurrentNewRole2() { return currentNewRole2;};
-
+	
+    /*******
+     * <p> Method: boolean getCurrentOneTimePasswordFlag() </p>
+     *
+     * <p> Description: Get the current user's one time password flag. When this is true, the
+     *              admin has set a one time password for this user and the user will use it to log in
+     *              and then create a new password.</p>
+     *
+     * @return true if a one time password is pending for this user, else false
+     *
+     */
+    public boolean getCurrentOneTimePasswordFlag() { return currentOneTimePasswordFlag; };
+    
+    /*******
+     * <p> Method: String getCurrentOneTimePassword() </p>
+     *
+     * <p> Description: Get the current user's one time password. This is null unless the admin
+     *              sets one that has not yet been used.</p>
+     *
+     * @return a string of the one time password, or null if there is not one.
+     *
+     */
+    public String getCurrentOneTimePassword() { return currentOneTimePassword; };
 	
 	/*******
 	 * <p> Debugging method</p>

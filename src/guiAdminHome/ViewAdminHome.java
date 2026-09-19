@@ -43,7 +43,8 @@ import guiUserUpdate.ViewUserUpdate;
  * @author Lynn Robert Carter
  * 
  * @version 1.00		2025-08-17 Initial version
- *  
+ * @version 1.01		2026-09-16 Added one time password alert.
+ * 
  */
 
 public class ViewAdminHome {
@@ -99,11 +100,12 @@ public class ViewAdminHome {
 	// admin buttons to use to perform other roles.  Many of these buttons are just stubs and an
 	// alert pops up to inform the admin of this fact.
 	protected static Button button_ManageInvitations = new Button("Manage Invitations");
-	protected static Button button_SetOnetimePassword = new Button("Set a One-Time Password");
+	protected static Button button_SetOneTimePassword = new Button("Set a One-Time Password");
 	protected static Button button_DeleteUser = new Button("Delete a User");
 	protected static Button button_ListUsers = new Button("List All Users");
 	protected static Button button_AddRemoveRoles = new Button("Add/Remove Roles");
 	protected static Alert alertNotImplemented = new Alert(AlertType.INFORMATION);
+	protected static Alert alertOneTimePassword = new Alert(AlertType.INFORMATION);
 
 	// This is a separator and it is used to partition the GUI for various tasks
 	private static Line line_Separator4 = new Line(20, 525, width-20,525);
@@ -248,9 +250,9 @@ public class ViewAdminHome {
 		button_ManageInvitations.setOnAction((_) -> 
 			{ControllerAdminHome.manageInvitations(); });
 	
-		setupButtonUI(button_SetOnetimePassword, "Dialog", 16, 250, Pos.CENTER, 20, 320);
-		button_SetOnetimePassword.setOnAction((_) -> 
-			{ControllerAdminHome.setOnetimePassword(); });
+		setupButtonUI(button_SetOneTimePassword, "Dialog", 16, 250, Pos.CENTER, 20, 320);
+		button_SetOneTimePassword.setOnAction((_) -> 
+			{ControllerAdminHome.setOneTimePassword(); });
 
 		setupButtonUI(button_DeleteUser, "Dialog", 16, 250, Pos.CENTER, 20, 370);
 		button_DeleteUser.setOnAction((_) -> {ControllerAdminHome.deleteUser(); });
@@ -279,7 +281,7 @@ public class ViewAdminHome {
     		label_InvitationEmailAddress, text_InvitationEmailAddress,
     		combobox_SelectRole, button_SendInvitation, line_Separator3,
     		button_ManageInvitations,
-    		button_SetOnetimePassword,
+    		button_SetOneTimePassword,
     		button_DeleteUser,
     		button_ListUsers,
     		button_AddRemoveRoles,

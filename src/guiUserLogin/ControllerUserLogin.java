@@ -3,6 +3,12 @@ package guiUserLogin;
 import database.Database;
 import entityClasses.User;
 import javafx.stage.Stage;
+import java.util.Optional;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.layout.GridPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 
 /*******
  * <p> Title: ControllerUserLogin Class. </p>
@@ -25,7 +31,8 @@ import javafx.stage.Stage;
  * @author Lynn Robert Carter
  * 
  * @version 1.00		2025-08-17 Initial version
- * @version 1.01		2025-09-16 Update Javadoc documentation *  
+ * @version 1.01		2025-09-16 Update Javadoc documentation *
+ * @version 1.02		2026-09-16 Added the one time password login and forced password reset  
  */
 
 public class ControllerUserLogin {
@@ -78,17 +85,29 @@ public class ControllerUserLogin {
     		return;
     	}
 		// System.out.println("*** Username is valid");
-		
-		// Check to see that the login password matches the account password
-    	String actualPassword = theDatabase.getCurrentPassword();
-    	
-    	if (password.compareTo(actualPassword) != 0) {
-    		ViewUserLogin.alertUsernamePasswordError.setContentText(
-    				"Incorrect username/password. Try again!");
-    		ViewUserLogin.alertUsernamePasswordError.showAndWait();
-    		return;
-    	}
-		// System.out.println("*** Password is valid for this user");
+        // Check if the login password matches the account password
+        String actualPassword = theDatabase.getCurrentPassword();
+
+        // If the admin has set a one time password for the user, that is the only credential
+        // accepted until a new password has been created.
+        if (theDatabase.getCurrentOneTimePasswordFlag()) {
+                String oneTimePassword = theDatabase.getCurrentOneTimePassword();
+                if (oneTimePassword == null || password.compareTo(oneTimePassword) != 0) {
+                        ViewUserLogin.alertUsernamePasswordError.setContentText(
+                                        "Incorrect username/password. Try again!");
+                        ViewUserLogin.alertUsernamePasswordError.showAndWait();
+                        return;
+                }
+                // The one time password was correct, so this requires a new password to be made
+                doNewPassword(username);
+                return;
+        }
+        if (password.compareTo(actualPassword) != 0) {
+            ViewUserLogin.alertUsernamePasswordError.setContentText(
+                            "Incorrect username/password. Try again!");
+            ViewUserLogin.alertUsernamePasswordError.showAndWait();
+            return;
+        }
 		
 		// Establish this user's details
     	User user = new User(username, password, theDatabase.getCurrentFirstName(), 
@@ -131,6 +150,64 @@ public class ControllerUserLogin {
 		}
 	}
 	
+    private static void doNewPassword(String username) {
+
+        // Keep asking until the user provides a non empty password that has been entered and
+        // confirmed. The user will not be able to escape this step and reach a home page
+        // using the one time password.
+        while (true) {
+
+                // Ask for the password twice to confirm it
+                Dialog<String> dialogNewPassword = new Dialog<String>();
+                dialogNewPassword.setTitle("Create a New Password");
+                dialogNewPassword.setHeaderText("Your one-time password has been accepted");
+                dialogNewPassword.getDialogPane().getButtonTypes().add(ButtonType.OK);
+
+                PasswordField text_NewPassword = new PasswordField();
+                text_NewPassword.setPromptText("Enter New Password");
+                PasswordField text_ConfirmPassword = new PasswordField();
+                text_ConfirmPassword.setPromptText("Enter New Password Again");
+
+                GridPane theGrid = new GridPane();
+                theGrid.setHgap(10);
+                theGrid.setVgap(10);
+                theGrid.add(new Label("New password:"), 0, 0);
+                theGrid.add(text_NewPassword, 1, 0);
+                theGrid.add(new Label("Confirm password:"), 0, 1);
+                theGrid.add(text_ConfirmPassword, 1, 1);
+                dialogNewPassword.getDialogPane().setContent(theGrid);
+
+                // Fetch what was typed in the first field when the button is pressed
+                dialogNewPassword.setResultConverter((_) -> text_NewPassword.getText());
+
+                Optional<String> result = dialogNewPassword.showAndWait();
+                if (result.isEmpty()) continue;
+                String newPassword = result.get();
+
+                if (newPassword.length() == 0) {
+                	ViewUserLogin.alertUsernamePasswordError.setContentText(
+                                        "The password may not be empty.  Try again.");
+                	ViewUserLogin.alertUsernamePasswordError.showAndWait();
+                    continue;
+                }
+
+                // The two entries must match
+                if (newPassword.compareTo(text_ConfirmPassword.getText()) != 0) {
+                		ViewUserLogin.alertUsernamePasswordError.setContentText(
+                                        "The two passwords did not match.  Try again.");
+                        ViewUserLogin.alertUsernamePasswordError.showAndWait();
+                        continue;
+                }
+
+                // Store the new password and clear the one time password so it cannot be used again
+                theDatabase.updatePassword(username, newPassword);
+                theDatabase.clearOneTimePassword(username);
+                break;
+        }
+
+        // The user can log in again using the new password
+        ViewUserLogin.displayUserLogin(theStage);
+}
 		
 	/**********
 	 * <p> Method: setup() </p>

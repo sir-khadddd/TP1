@@ -1,6 +1,9 @@
 package guiAdminHome;
 
 import database.Database;
+import java.util.List;
+import java.util.Optional;
+import javafx.scene.control.ChoiceDialog;
 
 /*******
  * <p> Title: GUIAdminHomePage Class. </p>
@@ -23,6 +26,7 @@ import database.Database;
  * 
  * @version 1.00		2025-08-17 Initial version
  * @version 1.01		2025-09-16 Update Javadoc documentation *  
+ * @version 1.02		2026-09-16 Added one time password login and forced password reset
  */
 
 public class ControllerAdminHome {
@@ -101,22 +105,57 @@ public class ControllerAdminHome {
 		ViewAdminHome.alertNotImplemented.setContentText("Manage Invitations Not Yet Implemented");
 		ViewAdminHome.alertNotImplemented.showAndWait();
 	}
+    /**********
+     * <p>
+     *
+     * Title: setOneTimePassword () Method. </p>
+     *
+     * <p> Description: Protected method that allows the admin to set a one time password for a user
+     * who forgot their password. The admin selects the user from the list of all the users in
+     * the system, then a one time password is generated and stored for that user, and it is displayed so
+     * the admin can pass it along. The user logs in with it and is required to create a new
+     * password and after the one time password is cleared. </p>
+     */
+    protected static void setOneTimePassword () {
+
+    		// Fetch the list of users for the admin to choose from. The list always starts with the
+            // "<Select a User>" prompt, so a list of one means there are no users at all.
+            List<String> userList = theDatabase.getUserList();
+            if (userList == null || userList.size() < 2) {
+                    ViewAdminHome.alertOneTimePassword.setTitle("One-Time Password");
+                    ViewAdminHome.alertOneTimePassword.setHeaderText("No Users");
+                    ViewAdminHome.alertOneTimePassword.setContentText(
+                                    "There are no users in the system.");
+                    ViewAdminHome.alertOneTimePassword.showAndWait();
+                    return;
+            }
+
+            // Ask the admin which user forgot their password
+            ChoiceDialog<String> dialog = new ChoiceDialog<String>(userList.get(0), userList);
+            dialog.setTitle("Set a One-Time Password");
+            dialog.setHeaderText("Select the user who forgot their password");
+            dialog.setContentText("User:");
+            Optional<String> selection = dialog.showAndWait();
+
+            // Do nothing if the admin cancels or leaves the prompt selected
+            if (selection.isEmpty()) {
+            	return;
+            }
+            String theSelectedUser = selection.get();
+            if (theSelectedUser.compareTo("<Select a User>") == 0) {
+            	return;
+            }
+
+            // Generate and store the one time password and then show it to admin
+            String oneTimePassword = theDatabase.setOneTimePassword(theSelectedUser);
+            String msg = "One-time password for " + theSelectedUser + " is: " + oneTimePassword;
+            System.out.println(msg);
+            ViewAdminHome.alertOneTimePassword.setTitle("One-Time Password");
+            ViewAdminHome.alertOneTimePassword.setHeaderText("One-Time Password Set");
+            ViewAdminHome.alertOneTimePassword.setContentText(msg);
+            ViewAdminHome.alertOneTimePassword.showAndWait();
+    }
 	
-	/**********
-	 * <p> 
-	 * 
-	 * Title: setOnetimePassword () Method. </p>
-	 * 
-	 * <p> Description: Protected method that is currently a stub informing the user that
-	 * this function has not yet been implemented. </p>
-	 */
-	protected static void setOnetimePassword () {
-		System.out.println("\n*** WARNING ***: One-Time Password Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
-		ViewAdminHome.alertNotImplemented.setHeaderText("One-Time Password Issue");
-		ViewAdminHome.alertNotImplemented.setContentText("One-Time Password Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.showAndWait();
-	}
 	
 	/**********
 	 * <p> 
