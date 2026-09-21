@@ -13,6 +13,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import database.Database;
 import entityClasses.User;
+import javafx.scene.paint.Color;
 
 /*******
  * <p> Title: ViewNewAccount Class. </p>
@@ -26,6 +27,7 @@ import entityClasses.User;
  * @author Lynn Robert Carter
  * 
  * @version 1.00		2025-08-19 Initial version
+ * @version 1.01		2026-09-21 Added password evaluator
  *  
  */
 
@@ -54,6 +56,7 @@ public class ViewNewAccount {
     protected static PasswordField text_Password2 = new PasswordField();
     protected static Button button_UserSetup = new Button("User Setup");
     protected static TextField text_Invitation = new TextField();
+    protected static Label label_PasswordError = new Label();
 
 	// This alert is used should the invitation code be invalid
     protected static Alert alertInvitationCodeIsInvalid = new Alert(AlertType.INFORMATION);
@@ -133,12 +136,16 @@ public class ViewNewAccount {
 		// Get the email address associated with the invitation code
 		emailAddress = theDatabase.getEmailAddressUsingCode(theInvitationCode);
 		
-    	// Place all of the established GUI elements into the pane
-    	theRootPane.getChildren().clear();
-    	theRootPane.getChildren().addAll(label_NewUserCreation, label_NewUserLine, text_Username,
-    			text_Password1, text_Password2, button_UserSetup, button_Quit);    	
+	    // Place the established GUI elements into the pane
+	    label_PasswordError.setText("");
+	    theRootPane.getChildren().clear();
+	    theRootPane.getChildren().addAll(label_NewUserCreation, label_NewUserLine, text_Username,
+	             text_Password1, text_Password2, label_PasswordError, button_UserSetup, button_Quit);
 
-		// Set the title for the window, display the page, and wait for the Admin to do something
+	    // Show the list of password requirements below the input fields
+	    passwordPopUpWindow.View.passwordRequirementDisplay(theRootPane, 50, 320, width);    	
+
+		// Set the title for the window, display the page, and wait for the admin
 		theStage.setTitle("CSE 360 Foundation Code: New User Account Setup");	
         theStage.setScene(theNewAccountScene);
 		theStage.show();
@@ -176,6 +183,12 @@ public class ViewNewAccount {
 		// Establish the text input operand field for the password
 		setupTextUI(text_Password1, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 210, true);
 		text_Password1.setPromptText("Enter the Password");
+        // Errors about password
+        setupLabelUI(label_PasswordError, "Arial", 14, width, Pos.BASELINE_LEFT, 50, 295);
+        label_PasswordError.setTextFill(Color.RED);
+        // Keep the password requirements up to date as user types
+        text_Password1.textProperty().addListener((_, _, _) ->
+                        passwordPopUpWindow.View.updateRequirements(text_Password1.getText()));
 		
 		// Establish the text input operand field to confirm the password
 		setupTextUI(text_Password2, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 260, true);

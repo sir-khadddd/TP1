@@ -6,9 +6,10 @@ import javafx.stage.Stage;
 import java.util.Optional;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.scene.layout.GridPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
 /*******
  * <p> Title: ControllerUserLogin Class. </p>
@@ -150,62 +151,92 @@ public class ControllerUserLogin {
 		}
 	}
 	
+    /**********
+     * <p> Method: doNewPassword(String username) </p>
+     *
+     * <p> Description: Called after a user logs in with a one time password. They have to set a
+     * new password here before they can go back to a home page.
+     *
+     * The dialog shows the password requirements and updates them as the user types, like the
+     * first admin page does.
+     *
+     * Once the password is entered twice and accepted, it is saved, the one time password is
+     * cleared so it cannot be used again, and the user returns to the login page.</p>
+     *
+     * @param username specifies the user who is setting a new password
+     *
+     */
     private static void doNewPassword(String username) {
 
-        // Keep asking until the user provides a non empty password that has been entered and
-        // confirmed. The user will not be able to escape this step and reach a home page
-        // using the one time password.
+        String errorMessage = "";
+
         while (true) {
 
-                // Ask for the password twice to confirm it
+        		// This is structured the same way the first admin page 
+                Pane thePane = new Pane();
+                thePane.setPrefSize(560, 420);
+
+                Label label_NewPassword = new Label("New password:");
+                label_NewPassword.setLayoutX(20);
+                label_NewPassword.setLayoutY(20);
+                PasswordField text_NewPassword = new PasswordField();
+                text_NewPassword.setPromptText("Enter New Password");
+                text_NewPassword.setLayoutX(170);
+                text_NewPassword.setLayoutY(15);
+                text_NewPassword.setPrefWidth(300);
+
+                Label label_ConfirmPassword = new Label("Confirm password:");
+                label_ConfirmPassword.setLayoutX(20);
+                label_ConfirmPassword.setLayoutY(60);
+                PasswordField text_ConfirmPassword = new PasswordField();
+                text_ConfirmPassword.setPromptText("Enter New Password Again");
+                text_ConfirmPassword.setLayoutX(170);
+                text_ConfirmPassword.setLayoutY(55);
+                text_ConfirmPassword.setPrefWidth(300);
+
+                Label label_Error = new Label(errorMessage);
+                label_Error.setLayoutX(20);
+                label_Error.setLayoutY(95);
+                label_Error.setTextFill(Color.RED);
+
+                thePane.getChildren().addAll(label_NewPassword, text_NewPassword,
+                                label_ConfirmPassword, text_ConfirmPassword, label_Error);
+
+                // Show the requirements as they type
+                passwordPopUpWindow.View.passwordRequirementDisplay(thePane, 20, 130, 540);
+                text_NewPassword.textProperty().addListener((_, _, _) ->
+                                passwordPopUpWindow.View.updateRequirements(text_NewPassword.getText()));
+
                 Dialog<String> dialogNewPassword = new Dialog<String>();
                 dialogNewPassword.setTitle("Create a New Password");
                 dialogNewPassword.setHeaderText("Your one-time password has been accepted");
                 dialogNewPassword.getDialogPane().getButtonTypes().add(ButtonType.OK);
-
-                PasswordField text_NewPassword = new PasswordField();
-                text_NewPassword.setPromptText("Enter New Password");
-                PasswordField text_ConfirmPassword = new PasswordField();
-                text_ConfirmPassword.setPromptText("Enter New Password Again");
-
-                GridPane theGrid = new GridPane();
-                theGrid.setHgap(10);
-                theGrid.setVgap(10);
-                theGrid.add(new Label("New password:"), 0, 0);
-                theGrid.add(text_NewPassword, 1, 0);
-                theGrid.add(new Label("Confirm password:"), 0, 1);
-                theGrid.add(text_ConfirmPassword, 1, 1);
-                dialogNewPassword.getDialogPane().setContent(theGrid);
-
-                // Fetch what was typed in the first field when the button is pressed
+                dialogNewPassword.getDialogPane().setContent(thePane);
                 dialogNewPassword.setResultConverter((_) -> text_NewPassword.getText());
 
                 Optional<String> result = dialogNewPassword.showAndWait();
                 if (result.isEmpty()) continue;
                 String newPassword = result.get();
 
-                if (newPassword.length() == 0) {
-                	ViewUserLogin.alertUsernamePasswordError.setContentText(
-                                        "The password may not be empty.  Try again.");
-                	ViewUserLogin.alertUsernamePasswordError.showAndWait();
-                    continue;
-                }
-
-                // The two entries must match
-                if (newPassword.compareTo(text_ConfirmPassword.getText()) != 0) {
-                		ViewUserLogin.alertUsernamePasswordError.setContentText(
-                                        "The two passwords did not match.  Try again.");
-                        ViewUserLogin.alertUsernamePasswordError.showAndWait();
+                // Check the new password against the requirements
+                if (!passwordPopUpWindow.Model.evaluatePassword(newPassword).isEmpty()) {
+                        errorMessage = "One or more password requirements not satisfied!";
                         continue;
                 }
 
-                // Store the new password and clear the one time password so it cannot be used again
+                // The two entries must be the same
+                if (newPassword.compareTo(text_ConfirmPassword.getText()) != 0) {
+                        errorMessage = "The two passwords must match. Please try again!";
+                        continue;
+                }
+
+                // Store the new password and remove the one time password so it cannot be reused
                 theDatabase.updatePassword(username, newPassword);
                 theDatabase.clearOneTimePassword(username);
                 break;
         }
 
-        // The user can log in again using the new password
+        // The user needs to log in again using the new password
         ViewUserLogin.displayUserLogin(theStage);
 }
 		

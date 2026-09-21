@@ -24,7 +24,7 @@ import entityClasses.User;
  * @author Lynn Robert Carter
  * 
  * @version 1.00		2025-08-17 Initial version
- *  
+ * @version 1.01		2026-09-21 Added password evaluator
  */
 
 public class ControllerNewAccount {
@@ -66,6 +66,13 @@ public class ControllerNewAccount {
 		// that the two password fields are the same before we do anything with it.)
 		String username = ViewNewAccount.text_Username.getText();
 		String password = ViewNewAccount.text_Password1.getText();
+        // Make sure the password satisfies the password requirements
+        String error = passwordPopUpWindow.Model.evaluatePassword(password);
+        if (!error.isEmpty()) {
+                ViewNewAccount.label_PasswordError.setText(
+                            "One or more password requirements not satisfied!");
+                return;
+        }
 		
 		// Display key information to the log
 		System.out.println("** Account for Username: " + username + "; theInvitationCode: "+
@@ -119,16 +126,17 @@ public class ControllerNewAccount {
             
             // Set the database so it has this user and the current user
             theDatabase.getUserAccountDetails(username);
-
+            
             // Navigate to the Welcome Login Page
             guiUserUpdate.ViewUserUpdate.displayUserUpdate(ViewNewAccount.theStage, user);
 		}
 		else {
 			// The two passwords are NOT the same, so clear the passwords, explain the passwords
 			// must be the same, and clear the message as soon as the first character is typed.
-			ViewNewAccount.text_Password1.setText("");
-			ViewNewAccount.text_Password2.setText("");
-			ViewNewAccount.alertUsernamePasswordError.showAndWait();
+            ViewNewAccount.text_Password1.setText("");
+            ViewNewAccount.text_Password2.setText("");
+            ViewNewAccount.label_PasswordError.setText(
+                            "The two passwords must match. Try again.");
 		}
 	}
 

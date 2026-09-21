@@ -12,6 +12,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import entityClasses.User;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.PasswordField;
+import javafx.scene.paint.Color;
 
 /*******
  * <p> Title: ViewUserUpdate Class. </p>
@@ -33,7 +37,7 @@ import entityClasses.User;
  * @author Lynn Robert Carter
  * 
  * @version 1.01		2025-08-19 Initial version plus new internal documentation
- *  
+ * @version 1.02		2026-09-21 Added password evaluator
  */
 
 public class ViewUserUpdate {
@@ -246,11 +250,12 @@ public class ViewUserUpdate {
         // Display the titles, values, and update buttons for the various admin account attributes.
         // If the attributes is null or empty, display "<none>".
         
-        // USername
+        // Username
         setupLabelUI(label_Username, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 100);
         setupLabelUI(label_CurrentUsername, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 100);
         setupButtonUI(button_UpdateUsername, "Dialog", 18, 275, Pos.CENTER, 500, 93);
-       
+        button_UpdatePassword.setOnAction((_) -> {doUpdatePassword();});
+        
         // password
         setupLabelUI(label_Password, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 150);
         setupLabelUI(label_CurrentPassword, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 150);
@@ -391,4 +396,86 @@ public class ViewUserUpdate {
 		b.setLayoutX(x);
 		b.setLayoutY(y);		
 	}
+	
+	 /**********
+     * <p> Method: doUpdatePassword() </p>
+     *
+     * <p> Description: Called when the user clicks the update password button. It shows the
+     * password requirements and then updates them as the user types, the same way the first admin page does. </p>
+     *
+     */
+    private static void doUpdatePassword() {
+
+            String errorMessage = "";
+
+            while (true) {
+
+                    Pane thePane = new Pane();
+                    thePane.setPrefSize(560, 420);
+
+                    Label label_NewPassword = new Label("New password:");
+                    label_NewPassword.setLayoutX(20);
+                    label_NewPassword.setLayoutY(20);
+                    PasswordField text_NewPassword = new PasswordField();
+                    text_NewPassword.setPromptText("Enter New Password");
+                    text_NewPassword.setLayoutX(170);
+                    text_NewPassword.setLayoutY(15);
+                    text_NewPassword.setPrefWidth(300);
+
+                    Label label_ConfirmPassword = new Label("Confirm password:");
+                    label_ConfirmPassword.setLayoutX(20);
+                    label_ConfirmPassword.setLayoutY(60);
+                    PasswordField text_ConfirmPassword = new PasswordField();
+                    text_ConfirmPassword.setPromptText("Enter New Password Again");
+                    text_ConfirmPassword.setLayoutX(170);
+                    text_ConfirmPassword.setLayoutY(55);
+                    text_ConfirmPassword.setPrefWidth(300);
+
+                    Label label_Error = new Label(errorMessage);
+                    label_Error.setLayoutX(20);
+                    label_Error.setLayoutY(95);
+                    label_Error.setTextFill(Color.RED);
+
+                    thePane.getChildren().addAll(label_NewPassword, text_NewPassword,
+                                    label_ConfirmPassword, text_ConfirmPassword, label_Error);
+
+                    // Show the requirements and updated them as the user types
+                    passwordPopUpWindow.View.passwordRequirementDisplay(thePane, 20, 130, 540);
+                    text_NewPassword.textProperty().addListener((_, _, _) ->
+                                    passwordPopUpWindow.View.updateRequirements(text_NewPassword.getText()));
+
+                    Dialog<String> dialogUpdatePassword = new Dialog<String>();
+                    dialogUpdatePassword.setTitle("Update Password");
+                    dialogUpdatePassword.setHeaderText("Enter a new password for " +
+                                    theUser.getUserName());
+                    dialogUpdatePassword.getDialogPane().getButtonTypes().addAll(ButtonType.OK,
+                                    ButtonType.CANCEL);
+                    dialogUpdatePassword.getDialogPane().setContent(thePane);
+                    dialogUpdatePassword.setResultConverter((b) ->
+                                    b == ButtonType.OK ? text_NewPassword.getText() : null);
+
+                    // The user is allowed to leave and keep the password they already have
+                    Optional<String> result = dialogUpdatePassword.showAndWait();
+                    if (result.isEmpty()) return;
+                    String newPassword = result.get();
+
+                    // Check the new password against the requirements
+                    if (!passwordPopUpWindow.Model.evaluatePassword(newPassword).isEmpty()) {
+                            errorMessage = "One or more password requirements not satisfied!";
+                            continue;
+                    }
+
+                    // The two entries must be the same
+                    if (newPassword.compareTo(text_ConfirmPassword.getText()) != 0) {
+                            errorMessage = "The two passwords must match. Try again.";
+                            continue;
+                    }
+
+                    // Save the new password and show it on the screen
+                    theDatabase.updatePassword(theUser.getUserName(), newPassword);
+                    theUser.setPassword(newPassword);
+                    label_CurrentPassword.setText(newPassword);
+                    return;
+            }
+    }
 }
