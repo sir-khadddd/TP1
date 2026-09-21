@@ -131,19 +131,19 @@ public class ControllerAddRemoveRoles {
 		ViewAddRemoveRoles.addList.add("<Select a role>");
 		if (!theDatabase.getCurrentAdminRole())
 			ViewAddRemoveRoles.addList.add("Admin");
-		if (!theDatabase.getCurrentNewRole1())
-			ViewAddRemoveRoles.addList.add("Role1");
-		if (!theDatabase.getCurrentNewRole2())
-			ViewAddRemoveRoles.addList.add("Role2");
+		if (!theDatabase.getCurrentNewContributor())
+			ViewAddRemoveRoles.addList.add("Contributor");
+		if (!theDatabase.getCurrentNewViewer())
+			ViewAddRemoveRoles.addList.add("Viewer");
 
 		// Create the list of roles that could be removed for the currently selected user (e.g., Do
 		// not show a role to remove that the user does not have!)
 		ViewAddRemoveRoles.removeList.clear();
 		ViewAddRemoveRoles.removeList.add("<Select a role>");
-		if (theDatabase.getCurrentNewRole1())
-			ViewAddRemoveRoles.removeList.add("Role1");
-		if (theDatabase.getCurrentNewRole2())
-			ViewAddRemoveRoles.removeList.add("Role2");
+		if (theDatabase.getCurrentNewContributor())
+			ViewAddRemoveRoles.removeList.add("Contributor");
+		if (theDatabase.getCurrentNewViewer())
+			ViewAddRemoveRoles.removeList.add("Viewer");
 		
 		// Create the list or roles that the user currently has with proper use of a comma between items
 		boolean notTheFirst = false;
@@ -156,21 +156,21 @@ public class ControllerAddRemoveRoles {
 		}
 		
 		// Roles 1 - It could be at the head of the list or later in the list
-		if (theDatabase.getCurrentNewRole1()) {
+		if (theDatabase.getCurrentNewContributor()) {
 			if (notTheFirst)
-				theCurrentRoles += ", Role1"; 
+				theCurrentRoles += ", Contributor"; 
 			else {
-				theCurrentRoles += "Role1";
+				theCurrentRoles += "Contributor";
 				notTheFirst = true;
 			}
 		}
 
 		// Roles 2 - It could be at the head of the list or later in the list
-		if (theDatabase.getCurrentNewRole2()) {
+		if (theDatabase.getCurrentNewViewer()) {
 			if (notTheFirst)
-				theCurrentRoles += ", Role2"; 
+				theCurrentRoles += ", Viewer"; 
 			else {
-				theCurrentRoles += "Role2";
+				theCurrentRoles += "Viewer";
 				notTheFirst = true;
 			}
 		}

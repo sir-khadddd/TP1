@@ -1,11 +1,11 @@
-package guiRole2;
+package guiViewer;
 
-public class ModelRole2Home {
+public class ModelViewerHome {
 
 /*******
- * <p> Title: ModelRole2Home Class. </p>
+ * <p> Title: ModelViewerHome Class. </p>
  * 
- * <p> Description: The Role2Home Page Model.  This class is a stub for future expansion.
+ * <p> Description: The ViewerHome Page Model.  This class is a stub for future expansion.
  * 
  * This class is not used as there is no unique data manipulation for this GUI page.</p>
  * 

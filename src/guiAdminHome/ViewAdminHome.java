@@ -90,7 +90,7 @@ public class ViewAdminHome {
 	protected static Label label_InvitationEmailAddress = new Label("Email Address");
 	protected static TextField text_InvitationEmailAddress = new TextField();
 	protected static ComboBox <String> combobox_SelectRole = new ComboBox <String>();
-	protected static String [] roles = {"Admin", "Role1", "Role2"};
+	protected static String [] roles = {"Admin", "Contributor", "Viewer"};
 	protected static Button button_SendInvitation = new Button("Send Invitation");
 	protected static Alert alertEmailError = new Alert(AlertType.INFORMATION);
 	protected static Alert alertEmailSent = new Alert(AlertType.INFORMATION);
@@ -134,7 +134,7 @@ public class ViewAdminHome {
 	protected static User theUser;				// The current logged in User
 
 	private static Scene theAdminHomeScene;		// The shared Scene each invocation populates
-	private static final int theRole = 1;		// Admin: 1; Role1: 2; Role2: 3
+	private static final int theRole = 1;		// Admin: 1; Contributor: 2; Viewer: 3
 
 	/*-*******************************************************************************************
 
