@@ -1,1 +1,65 @@
-/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+/*This file contains the shared application theme, inspired by Spotify.
+ * The background color is dark grey (#141414), and the accent color is
+ * turquoise (#40E0D0), and errors are red (#FF5C5C). This theme is
+ * applied to all non-admin screens. The admin screens will maintain the
+ * provided design.
+ */
+ 
+ /*Sets background to dark grey, declares Arial as the default font*/
+ 
+ .root{
+ 	-fx-background-color: #141414;
+ 	-fx-font-family: "Arial";
+ }
+ 
+ /*Sets the text to white on every label to maintain readability on
+  * a dark background.
+*/
+
+ .label{
+ 	-fx-text-fill: #FFFFFF;
+ }
+ 
+ /*Styles both input options identically: the fill of the field, the 
+  * color the user types, the color of the placeholder text, corners 
+  rounded, the resting outline, the spacing of the field */
+  
+ .text-field, .password-field{
+ 	-fx-background-color: #2A2A2A;
+    -fx-text-fill: #FFFFFF;
+    -fx-prompt-text-fill: #A0A0A0;
+    -fx-background-radius: 20;
+    -fx-border-color: #3E3E3E;
+    -fx-border-radius: 20;
+    -fx-padding: 4 12 4 12;
+ }
+ 
+ /*Switches the border to turquoise when there is a cursor in the field */
+ 
+ .text-field:focused, .password-field:focused {
+    -fx-border-color: #40E0D0;
+}
+
+/*Every button is turquoise filled with dark text, bold, rounded corners
+ * change the mouse pointer so that the button seems clickable */
+
+.button {
+    -fx-background-color: #40E0D0;
+    -fx-text-fill: #141414;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+}
+
+/*When the mouse is hovered over a button, the turquoise becomes lighter */
+
+.button:hover {
+    -fx-background-color: #5FF0E0;
+}
+
+/* Custom class for inline messages. Only applies where the code calls it*/
+
+.error-label {
+    -fx-text-fill: #FF5C5C;
+    -fx-font-size: 12px;
+}

@@ -122,6 +122,10 @@ public class ViewUserLogin {
 		theRootPane = new Pane();
 		theUserLoginScene = new Scene(theRootPane, width, height);
 		
+		// Attach the shared team stylesheet so that this screen matches the agreed upon design
+		theRootPane.getStylesheets().add(
+		getClass().getResource("/applicationMain/application.css").toExternalForm());
+				
 		// Populate the window with the title and other common widgets and set their static state
 		setupLabelUI(label_ApplicationTitle, "Arial", 32, width, Pos.CENTER, 0, 10);
 
