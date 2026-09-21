@@ -29,6 +29,7 @@ import entityClasses.User;
  * @version 2.01		2025-12-17 Minor updates for Spring 2026
  * @version 2.02        2026-09-16 Added one time password storage and password update
  * @version 2.03        2026-09-19 Added delete user
+ * @version 2.04        2026-09-21 Added list of users
  */
 
 /*
@@ -225,14 +226,14 @@ public class Database {
 		
 	}
 	
-/*******
- *  <p> Method: List getUserList() </p>
- *  
- *  <P> Description: Generate an List of Strings, one for each user in the database,
- *  starting with "<Select User>" at the start of the list. </p>
- *  
- *  @return a list of userNames found in the database.
- */
+	/*******
+ 	*  <p> Method: List getUserList() </p>
+ 	*  
+ 	*  <P> Description: Generate an List of Strings, one for each user in the database,
+ 	*  starting with "<Select User>" at the start of the list. </p>
+ 	*  
+ 	*  @return a list of userNames found in the database.
+ 	*/
 	public List<String> getUserList () {
 		List<String> userList = new ArrayList<String>();
 		userList.add("<Select a User>");
@@ -245,10 +246,68 @@ public class Database {
 		} catch (SQLException e) {
 	        return null;
 	    }
-//		System.out.println(userList);
+		// System.out.println(userList);
 		return userList;
 	}
 
+	 /*******
+     *  <p> Method: List getUserDetailsList() </p>
+     *
+     *  <P> Description: Generate a list of strings for each user in the database, where each
+     *  string holds that user's username, name, email address, and roles
+     *
+     *  Only the username and password are required when an account is created, so some of the
+     *  name fields and the email address may be empty. They will say "empty". </p>
+     *
+     *  @return a list of the details of each user in the database, or null if it fails.
+     */
+    public List<String> getUserDetailsList () {
+            List<String> theUserList = new ArrayList<String>();
+            String query = "SELECT * FROM userDB";
+
+            
+            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                    ResultSet rs = pstmt.executeQuery();
+                    while (rs.next()) {
+
+                            // Build the user's name from the parts provided
+                            String theName = "";
+                            String firstName = rs.getString("firstName");
+                            String middleName = rs.getString("middleName");
+                            String lastName = rs.getString("lastName");
+                            if (firstName != null && firstName.length() > 0) theName += firstName + " ";
+                            if (middleName != null && middleName.length() > 0) theName += middleName + " ";
+                            if (lastName != null && lastName.length() > 0) theName += lastName;
+                            theName = theName.trim();
+                            if (theName.length() == 0) theName = "empty";
+
+                            // Create the list of roles this user has separated by commas
+                            String theRoles = "";
+                            if (rs.getBoolean("adminRole")) theRoles += "Admin";
+                            if (rs.getBoolean("newRole1")) {
+                                    if (theRoles.length() > 0) theRoles += ", ";
+                                    theRoles += "Role1";
+                            }
+                            if (rs.getBoolean("newRole2")) {
+                                    if (theRoles.length() > 0) theRoles += ", ";
+                                    theRoles += "Role2";
+                            }
+                            if (theRoles.length() == 0) theRoles = "empty";
+
+                            String emailAddress = rs.getString("emailAddress");
+                            if (emailAddress == null || emailAddress.length() == 0) emailAddress = "empty";
+
+                            theUserList.add(rs.getString("userName") + "  |  " + theName + "  |  " +
+                                            emailAddress + "  |  " + theRoles);
+                    }
+                    
+            } catch (SQLException e) {
+                    e.printStackTrace();
+                    return null;
+            }
+            return theUserList;
+    }
+	
 /*******
  * <p> Method: boolean loginAdmin(User user) </p>
  * 

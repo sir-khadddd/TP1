@@ -7,6 +7,8 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.Dialog;
 
 /*******
  * <p> Title: GUIAdminHomePage Class. </p>
@@ -31,6 +33,9 @@ import javafx.scene.control.ButtonType;
  * @version 1.01		2025-09-16 Update Javadoc documentation *  
  * @version 1.02		2026-09-16 Added one time password login and forced password reset
  * @version 1.03        2026-09-19 Added delete user account feature
+ * @version 1.04        2026-09-21 Added list of users
+ * 
+ * 
  */
 
 public class ControllerAdminHome {
@@ -245,21 +250,51 @@ public class ControllerAdminHome {
             }
     }
 	
-	/**********
-	 * <p> 
-	 * 
-	 * Title: listUsers () Method. </p>
-	 * 
-	 * <p> Description: Protected method that is currently a stub informing the user that
-	 * this function has not yet been implemented. </p>
-	 */
-	protected static void listUsers() {
-		System.out.println("\n*** WARNING ***: List Users Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
-		ViewAdminHome.alertNotImplemented.setHeaderText("List User Issue");
-		ViewAdminHome.alertNotImplemented.setContentText("List Users Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.showAndWait();
-	}
+    /**********
+     * <p>
+     *
+     * Title: listUsers () Method. </p>
+     *
+     * <p> Description: Protected method that shows the admin every user account in the system.
+     * For each account it lists the username, the user's name, their email address, and the roles they have.
+     *
+     * The list goes in a TextArea so it can be scrolled when there are more accounts than fit on the screen. </p>
+     */
+    protected static void listUsers() {
+
+            // Fetch the details of each user in the system
+            List<String> userDetails = theDatabase.getUserDetailsList();
+            if (userDetails == null || userDetails.size() == 0) {
+                    Alert alertNoUsers = new Alert(AlertType.INFORMATION);
+                    alertNoUsers.setTitle("List All Users");
+                    alertNoUsers.setHeaderText("No Users");
+                    alertNoUsers.setContentText("There are no users in the system.");
+                    alertNoUsers.showAndWait();
+                    return;
+            }
+
+            // Put each user on a row of their own, under a heading describing what each column is
+            String theList = "Username  |  Name  |  Email Address  |  Roles\n";
+            theList += "-------------------------------------------------------------\n";
+            for (int i = 0; i < userDetails.size(); i++) {
+                    theList += userDetails.get(i) + "\n";
+            }
+            System.out.println("\n" + theList);
+
+            // A TextArea is used so that a long list is easily scrolled.
+            TextArea text_UserList = new TextArea(theList);
+            text_UserList.setEditable(false);
+            text_UserList.setWrapText(false);
+            text_UserList.setPrefColumnCount(60);
+            text_UserList.setPrefRowCount(20);
+
+            Dialog<String> dialogUserList = new Dialog<String>();
+            dialogUserList.setTitle("List All Users");
+            dialogUserList.setHeaderText("There are " + userDetails.size() + " users in the system");
+            dialogUserList.getDialogPane().setContent(text_UserList);
+            dialogUserList.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+            dialogUserList.showAndWait();
+    }
 	
 	/**********
 	 * <p> 
