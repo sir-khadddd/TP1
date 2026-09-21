@@ -115,6 +115,7 @@ public class Model {
 	public static boolean foundNumericDigit = false;
 	public static boolean foundSpecialChar = false;
 	public static boolean foundLongEnough = false;
+	public static boolean foundNotTooLong = false;		// variable tracking that password is not too long
 	private static String inputLine = "";				// The input line
 	private static char currentChar;					// The current character in the line
 	private static int currentCharNdx;					// The index of the current character
@@ -170,6 +171,12 @@ public class Model {
 			View.label_LongEnough.setText("At least eight characters - Satisfied");
 			View.label_LongEnough.setTextFill(Color.GREEN);
 		}
+		
+		if (foundNotTooLong) {
+			View.label_NotTooLong.setText("At most sixty-four characters - Satisfied");
+			View.label_NotTooLong.setTextFill(Color.GREEN);
+		}
+		// check for when password passes requirements of being within the 64-character limit
 	}
 	
 
@@ -213,6 +220,7 @@ public class Model {
 		foundSpecialChar = false;			// Reset the Boolean flag
 		foundNumericDigit = false;			// Reset the Boolean flag
 		foundLongEnough = false;			// Reset the Boolean flag
+		foundNotTooLong = false;			// Reset the Boolean flag
 		
 		// This flag determines whether the directed graph (FSM) loop is operating or not
 		running = true;						// Start the loop
@@ -243,6 +251,11 @@ public class Model {
 				System.out.println("At least 8 characters found");
 				foundLongEnough = true;
 			}
+			if (currentCharNdx <= 63) {
+				System.out.println("At most 64 characters found");
+				foundLongEnough = true;
+			}
+			// added to check password length is under the limit
 			
 			// Go to the next character if there is one
 			currentCharNdx++;
@@ -270,6 +283,9 @@ public class Model {
 			
 		if (!foundLongEnough)
 			errMessage += "Long Enough; ";
+		
+		if (!foundNotTooLong) 
+			errMessage += "Not too long; "; // added to list of requirement elements
 		
 		if (errMessage == "")
 			return "";
