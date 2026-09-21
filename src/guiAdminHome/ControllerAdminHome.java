@@ -4,6 +4,9 @@ import database.Database;
 import java.util.List;
 import java.util.Optional;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 
 /*******
  * <p> Title: GUIAdminHomePage Class. </p>
@@ -27,6 +30,7 @@ import javafx.scene.control.ChoiceDialog;
  * @version 1.00		2025-08-17 Initial version
  * @version 1.01		2025-09-16 Update Javadoc documentation *  
  * @version 1.02		2026-09-16 Added one time password login and forced password reset
+ * @version 1.03        2026-09-19 Added delete user account feature
  */
 
 public class ControllerAdminHome {
@@ -157,21 +161,89 @@ public class ControllerAdminHome {
     }
 	
 	
-	/**********
-	 * <p> 
-	 * 
-	 * Title: deleteUser () Method. </p>
-	 * 
-	 * <p> Description: Protected method that is currently a stub informing the user that
-	 * this function has not yet been implemented. </p>
-	 */
-	protected static void deleteUser() {
-		System.out.println("\n*** WARNING ***: Delete User Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
-		ViewAdminHome.alertNotImplemented.setHeaderText("Delete User Issue");
-		ViewAdminHome.alertNotImplemented.setContentText("Delete User Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.showAndWait();
-	}
+    /**********
+     * <p>
+     *
+     * Title: deleteUser () Method. </p>
+     *
+     * <p> Description: Protected method that allows the admin to remove a user from the system so
+     * that person can no longer log in. The admin chooses the user from a list of all other
+     * users and must answer "Yes" to an "Are you sure?" question before anything is removed.
+     * An admin is not allowed to remove their own access, so the current admin's username is
+     * not offered in the list of users that can be deleted. </p>
+     */
+    protected static void deleteUser() {
+
+            // Get the list of users and take out the admin doing the deleting
+            List<String> userList = theDatabase.getUserList();
+            if (userList == null) {
+            	return;
+            }
+            userList.remove(ViewAdminHome.theUser.getUserName());
+
+            // The list always starts with the "<Select a User>" prompt, so a list of one means that there
+            // is nobody this admin is allowed to delete.
+            Alert alertNoUsers = new Alert(AlertType.INFORMATION);
+            if (userList.size() < 2) {
+                    alertNoUsers.setTitle("Delete a User");
+                    alertNoUsers.setHeaderText("No Users");
+                    alertNoUsers.setContentText("There are no other users to delete.");
+                    alertNoUsers.showAndWait();
+                    return;
+            }
+            // Ask admin which user to delete
+            ChoiceDialog<String> dialog = new ChoiceDialog<String>(userList.get(0), userList);
+            dialog.setTitle("Delete a User");
+            dialog.setHeaderText("Select the user to be deleted");
+            dialog.setContentText("User:");
+            Optional<String> selection = dialog.showAndWait();
+
+            if (selection.isEmpty()) return;
+            String theSelectedUser = selection.get();
+            if (theSelectedUser.compareTo("<Select a User>") == 0) return;
+
+            // Admin can not delete their own account
+            if (theSelectedUser.compareTo(ViewAdminHome.theUser.getUserName()) == 0) {
+                    alertNoUsers.setTitle("Delete a User");
+                    alertNoUsers.setHeaderText("Not Allowed");
+                    alertNoUsers.setContentText("An admin may not remove their own access.");
+                    alertNoUsers.showAndWait();
+                    return;
+            }
+
+            // Require a yes before removal
+            ButtonType buttonYes = new ButtonType("Yes");
+            ButtonType buttonNo = new ButtonType("No");
+            ViewAdminHome.alertDeleteUser.getButtonTypes().setAll(buttonYes, buttonNo);
+            ViewAdminHome.alertDeleteUser.setTitle("Delete a User");
+            ViewAdminHome.alertDeleteUser.setHeaderText("Are you sure?");
+            ViewAdminHome.alertDeleteUser.setContentText(
+                            "This will remove all access for " + theSelectedUser + ".");
+            Optional<ButtonType> answer = ViewAdminHome.alertDeleteUser.showAndWait();
+
+            // Anything other than yes leaves the user in place
+            if (answer.isEmpty() || answer.get() != buttonYes) {
+            	return;
+            }
+
+            // Remove the user and report what happened
+            if (theDatabase.deleteUser(theSelectedUser)) {
+                    System.out.println("*** User " + theSelectedUser + " has been deleted");
+                    alertNoUsers.setTitle("Delete a User");
+                    alertNoUsers.setHeaderText("User Deleted");
+                    alertNoUsers.setContentText(theSelectedUser + " has been removed from the system.");
+                    alertNoUsers.showAndWait();
+
+                    // The number of users on the admin home
+                    ViewAdminHome.label_NumberOfUsers.setText("Number of users: " +
+                                    theDatabase.getNumberOfUsers());
+            } else {
+                    alertNoUsers.setTitle("Delete a User");
+                    alertNoUsers.setHeaderText("Delete Failed");
+                    alertNoUsers.setContentText("The user could not be deleted.");
+                    alertNoUsers.showAndWait();
+            }
+    }
 	
 	/**********
 	 * <p> 

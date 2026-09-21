@@ -28,6 +28,7 @@ import entityClasses.User;
  * 							Mukkiri and Ishwarya Hidkimath Basavaraj
  * @version 2.01		2025-12-17 Minor updates for Spring 2026
  * @version 2.02        2026-09-16 Added one time password storage and password update
+ * @version 2.03        2026-09-19 Added delete user
  */
 
 /*
@@ -597,6 +598,29 @@ public class Database {
 	    }
 		return;
 	}
+	
+    /*******
+     * <p> Method: boolean deleteUser(String username) </p>
+     *
+     * <p> Description: Given a username, this method will remove that user's record from the user
+     * database. After it is removed, that person can no longer log in. </p>
+     *
+     * @param username is the username of the user to be removed
+     *
+     * @return true if a user was removed, else false
+     *
+     */
+    // Remove a user from the database
+    public boolean deleteUser(String username) {
+            String query = "DELETE FROM userDB WHERE userName = ?";
+            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                    pstmt.setString(1, username);
+                    return pstmt.executeUpdate() > 0;
+            } catch (SQLException e) {
+                    e.printStackTrace();
+                    return false;
+            }
+    }
 	
 	
 	/*******

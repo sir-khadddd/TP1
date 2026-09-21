@@ -43,7 +43,9 @@ import guiUserUpdate.ViewUserUpdate;
  * @author Lynn Robert Carter
  * 
  * @version 1.00		2025-08-17 Initial version
- * @version 1.01		2026-09-16 Added one time password alert.
+ * @version 1.01		2026-09-16 Added one time password alert
+ * @version 1.02        2026-09-19 Added delete user alert
+ * 
  * 
  */
 
@@ -106,6 +108,7 @@ public class ViewAdminHome {
 	protected static Button button_AddRemoveRoles = new Button("Add/Remove Roles");
 	protected static Alert alertNotImplemented = new Alert(AlertType.INFORMATION);
 	protected static Alert alertOneTimePassword = new Alert(AlertType.INFORMATION);
+	protected static Alert alertDeleteUser = new Alert(AlertType.CONFIRMATION);
 
 	// This is a separator and it is used to partition the GUI for various tasks
 	private static Line line_Separator4 = new Line(20, 525, width-20,525);
