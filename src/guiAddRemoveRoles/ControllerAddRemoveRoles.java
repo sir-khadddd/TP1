@@ -25,6 +25,7 @@ import javafx.scene.control.ComboBox;
  * 
  * @version 1.00		2025-08-17 Initial version
  * @version 1.01		2025-09-16 Update Javadoc documentation *  
+ * @version 1.02		2026-09-21 Cannot remove admin role
  */
 
 public class ControllerAddRemoveRoles {
@@ -139,15 +140,12 @@ public class ControllerAddRemoveRoles {
 		// not show a role to remove that the user does not have!)
 		ViewAddRemoveRoles.removeList.clear();
 		ViewAddRemoveRoles.removeList.add("<Select a role>");
-		if (theDatabase.getCurrentAdminRole())
-			ViewAddRemoveRoles.removeList.add("Admin");
 		if (theDatabase.getCurrentNewRole1())
 			ViewAddRemoveRoles.removeList.add("Role1");
 		if (theDatabase.getCurrentNewRole2())
 			ViewAddRemoveRoles.removeList.add("Role2");
 		
-		// Create the list or roles that the user currently has with proper use of a comma between
-		// items
+		// Create the list or roles that the user currently has with proper use of a comma between items
 		boolean notTheFirst = false;
 		String theCurrentRoles = "";
 		
