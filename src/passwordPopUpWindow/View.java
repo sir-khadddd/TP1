@@ -79,6 +79,69 @@ public class View {
 	static protected Label label_NotTooLong = new Label(); // added to represent when user enters overly long 
 														  // password (> 64 characters)
 
+	// needs comments
+	public static void passwordRequirementDisplay(Pane theRoot, double x, double y, double windowWidth) {
+		Label title = new Label("A valid password contains:");
+		
+		setupLabelWidget(label_Requirements, x, y, "Arial", 16, windowWidth-10, 
+	    		Pos.BASELINE_LEFT);
+	    
+	    setupLabelWidget(label_UpperCase, x + 20, y + 40, "Arial", 14, windowWidth-10, 
+				Pos.BASELINE_LEFT);
+
+	    setupLabelWidget(label_LowerCase, x + 20, y + 70, "Arial", 14, windowWidth-10, 
+				Pos.BASELINE_LEFT);
+	    
+	    setupLabelWidget(label_NumericDigit, x + 20, y + 100, "Arial", 14, windowWidth-10, 
+				Pos.BASELINE_LEFT);
+	    
+	    setupLabelWidget(label_SpecialChar, x + 20, y + 130, "Arial", 14, windowWidth-10, 
+				Pos.BASELINE_LEFT);
+	    
+	    setupLabelWidget(label_LongEnough, x + 20, y + 160, "Arial", 14, windowWidth-10, 
+				Pos.BASELINE_LEFT);
+	    
+	    setupLabelWidget(label_NotTooLong, x + 20, y + 190, "Arial", 14, windowWidth-10, 
+	    		Pos.BASELINE_LEFT);
+	    
+	    theRoot.getChildren().addAll(label_Requirements, label_UpperCase, 
+	    		label_LowerCase, label_NumericDigit, label_SpecialChar, label_LongEnough,
+	    		label_NotTooLong);
+	    updateRequirements("");
+	}
+	
+	// needs comments
+	public static void updateRequirements(String password) {
+		boolean empty = password.isEmpty();
+		if (!empty) { 
+			passwordPopUpWindow.Model.evaluatePassword(password);
+		}
+		
+		setRequirement(label_UpperCase, "At least one upper case letter",
+					!empty && passwordPopUpWindow.Model.foundUpperCase);
+		setRequirement(label_LowerCase, "At least one lower case letter",
+				!empty && passwordPopUpWindow.Model.foundLowerCase);
+		setRequirement(label_NumericDigit, "At least numeric digit",
+				!empty && passwordPopUpWindow.Model.foundNumericDigit);
+		setRequirement(label_SpecialChar, "At least one special character",
+				!empty && passwordPopUpWindow.Model.foundSpecialChar);
+		setRequirement(label_LongEnough, "At least eight characters",
+				!empty && passwordPopUpWindow.Model.foundLongEnough);
+		setRequirement(label_NotTooLong, "At most sixty-four characters",
+				!empty && passwordPopUpWindow.Model.foundNotTooLong);
+		
+	}
+	
+	// needs comments
+	private static void setRequirement(Label label, String text, boolean satisfied) {
+		if (satisfied) {
+			label.setText(text + " - Satisfied");
+			label.setTextFill(Color.GREEN);
+		} else {
+			label.setText(text + " - Not yet satisfied");
+			label.setTextFill(Color.RED);
+		}
+	}
     /* 
 	 * Button to finish the process.  It only become active when all the requirements have been met
 	 * 

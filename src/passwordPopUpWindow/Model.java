@@ -253,7 +253,9 @@ public class Model {
 			}
 			if (currentCharNdx <= 63) {
 				System.out.println("At most 64 characters found");
-				foundLongEnough = true;
+				foundNotTooLong = true;
+			} else {
+				foundNotTooLong = false;
 			}
 			// added to check password length is under the limit
 			
@@ -268,31 +270,35 @@ public class Model {
 		}
 		
 		// Construct a String with a list of the requirement elements that were found.
+		// ** error messages are changed so the user gets a better understanding of what requirements
+		// need met (more user-friendly feedback)
 		String errMessage = "";
 		if (!foundUpperCase)
-			errMessage += "Upper case; ";
+			errMessage += "At least one upper case letter - Not Satisfied\n"; // ** \n added to all lines for better user readability
 		
 		if (!foundLowerCase)
-			errMessage += "Lower case; ";
+			errMessage += "At least one lower case letter - Not Satisfied\n";
 		
 		if (!foundNumericDigit)
-			errMessage += "Numeric digits; ";
+			errMessage += "At least one digit - Not Satisfied\n";
 			
 		if (!foundSpecialChar)
-			errMessage += "Special character; ";
+			errMessage += "At least one special character - Not Satisfied\n";
 			
 		if (!foundLongEnough)
-			errMessage += "Long Enough; ";
+			errMessage += "At least 8 characters - Not Satisfied\n";
 		
 		if (!foundNotTooLong) 
-			errMessage += "Not too long; "; // added to list of requirement elements
+			errMessage += "At most 64 characters - Not Satisfied\n"; // added to list of requirement elements
 		
 		if (errMessage == "")
 			return "";
 		
 		// If it gets here, there something was not found, so return an appropriate message
 		passwordIndexofError = currentCharNdx;
-		return errMessage + "conditions were not satisfied";
+		return errMessage + "One or More Conditions Were Not Satisfied";
 	}
+	
+	
 }
  

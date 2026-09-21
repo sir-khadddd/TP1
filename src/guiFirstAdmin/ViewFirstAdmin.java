@@ -164,8 +164,11 @@ public class ViewFirstAdmin {
 		setupTextUI(text_AdminPassword1, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 210, 
 				true);
 		text_AdminPassword1.setPromptText("Enter Admin Password");
-		text_AdminPassword1.textProperty().addListener((_, _, _)
-				-> {ControllerFirstAdmin.setAdminPassword1(); });
+		// add comment
+		text_AdminPassword1.textProperty().addListener((_, _, _) 
+				-> { ControllerFirstAdmin.setAdminPassword1(); 
+				passwordPopUpWindow.View.updateRequirements(text_AdminPassword1.getText());
+				});
 
 		// Establish the text input operand field for the password
 		setupTextUI(text_AdminPassword2, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 260, 
@@ -182,6 +185,7 @@ public class ViewFirstAdmin {
 
 		// Label to display the Passwords do not match error message
 		setupLabelUI(label_PasswordsDoNotMatch, "Arial", 18, width, Pos.CENTER, 0, 300);
+	
 
 		setupButtonUI(button_Quit, "Dialog", 18, 250, Pos.CENTER, 300, 520);
 		button_Quit.setOnAction((_) -> {ControllerFirstAdmin.performQuit(); });
@@ -191,6 +195,8 @@ public class ViewFirstAdmin {
 				label_TitleLine2, text_AdminUsername, text_AdminPassword1, 
 				text_AdminPassword2, button_AdminSetup, label_PasswordsDoNotMatch,
 				button_Quit);
+		// add comment
+		passwordPopUpWindow.View.passwordRequirementDisplay(theRootPane, 50, 300, width);
 	}
 	
 	

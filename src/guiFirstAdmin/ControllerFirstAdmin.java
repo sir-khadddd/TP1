@@ -104,6 +104,16 @@ public class ControllerFirstAdmin {
 	 */
 	protected static void doSetupAdmin(Stage ps, int r) {
 		
+		// calls evaluatePassword method from model of passwordPopUpWindow to check that
+		// the password passes the requirements
+		String error = passwordPopUpWindow.Model.evaluatePassword(adminPassword1);
+		if (!error.isEmpty()) {
+			ViewFirstAdmin.label_PasswordsDoNotMatch.setText("\n   "
+					+ "**One or more password requirements"
+					+ " not satisfied. Please try again!**");
+			return;
+		}
+		
 		// Make sure the two passwords are the same
 		if (adminPassword1.compareTo(adminPassword2) == 0) {
         	// Create the passwords and proceed to the user home page
@@ -129,8 +139,11 @@ public class ControllerFirstAdmin {
 			ViewFirstAdmin.text_AdminPassword1.setText("");
 			ViewFirstAdmin.text_AdminPassword2.setText("");
 			ViewFirstAdmin.label_PasswordsDoNotMatch.setText(
-					"The two passwords must match. Please try again!");
+					"\n   **The two passwords must match. Please try again!**"); // slightly adjusted
+			// for easier readability
 		}
+		
+		
 	}
 	
 	
