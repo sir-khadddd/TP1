@@ -1,4 +1,4 @@
-package guiRole2;
+package guiContributor;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,14 +9,13 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import database.Database;
-//import database.Database;
 import entityClasses.User;
 
 
 /*******
- * <p> Title: ViewRole2Home Class. </p>
+ * <p> Title: ViewContributorHome Class. </p>
  * 
- * <p> Description: The Java/FX-based Role2 Home Page.  The page is a stub for some role needed for
+ * <p> Description: The Java/FX-based Contributor Home Page.  The page is a stub for some role needed for
  * the application.  The widgets on this page are likely the minimum number and kind for other role
  * pages that may be needed.</p>
  * 
@@ -24,11 +23,11 @@ import entityClasses.User;
  * 
  * @author Lynn Robert Carter
  * 
- * @version 1.00		2025-04-20 Initial version
+ * @version 1.00		2025-08-20 Initial version
  *  
  */
 
-public class ViewRole2Home {
+public class ViewContributorHome {
 	
 	/*-*******************************************************************************************
 
@@ -49,7 +48,7 @@ public class ViewRole2Home {
 	protected static Label label_PageTitle = new Label();
 	protected static Label label_UserDetails = new Label();
 	protected static Button button_UpdateThisUser = new Button("Account Update");
-		
+	
 	// This is a separator and it is used to partition the GUI for various tasks
 	protected static Line line_Separator1 = new Line(20, 95, width-20, 95);
 
@@ -69,7 +68,7 @@ public class ViewRole2Home {
 	// This is the end of the GUI objects for the page.
 	
 	// These attributes are used to configure the page and populate it with this user's information
-	private static ViewRole2Home theView;		// Used to determine if instantiation of the class
+	private static ViewContributorHome theView;		// Used to determine if instantiation of the class
 												// is needed
 
 	// Reference for the in-memory database so this package has access
@@ -79,8 +78,9 @@ public class ViewRole2Home {
 	protected static Pane theRootPane;			// The Pane that holds all the GUI widgets
 	protected static User theUser;				// The current logged in User
 	
-	private static Scene theRole2HomeScene;		// The shared Scene each invocation populates
-	protected static final int theRole = 3;		// Admin: 1; Role1: 2; Role2: 3
+
+	private static Scene theViewContributorHomeScene;	// The shared Scene each invocation populates
+	protected static final int theRole = 2;		// Admin: 1; Contributor: 2; Viewer: 3
 
 	/*-*******************************************************************************************
 
@@ -88,11 +88,12 @@ public class ViewRole2Home {
 	
 	 */
 
+
 	/**********
-	 * <p> Method: displayRole2Home(Stage ps, User user) </p>
+	 * <p> Method: displayContributorHome(Stage ps, User user) </p>
 	 * 
 	 * <p> Description: This method is the single entry point from outside this package to cause
-	 * the Role2 Home page to be displayed.
+	 * the Contributor Home page to be displayed.
 	 * 
 	 * It first sets up every shared attributes so we don't have to pass parameters.
 	 * 
@@ -109,58 +110,58 @@ public class ViewRole2Home {
 	 * @param user specifies the User for this GUI and it's methods
 	 * 
 	 */
-	public static void displayRole2Home(Stage ps, User user) {
+	public static void displayContributorHome(Stage ps, User user) {
 		
 		// Establish the references to the GUI and the current user
 		theStage = ps;
 		theUser = user;
 		
 		// If not yet established, populate the static aspects of the GUI
-		if (theView == null) theView = new ViewRole2Home();		// Instantiate singleton if needed
+		if (theView == null) theView = new ViewContributorHome();		// Instantiate singleton if needed
 		
 		// Populate the dynamic aspects of the GUI with the data from the user and the current
 		// state of the system.
 		theDatabase.getUserAccountDetails(user.getUserName());
 		applicationMain.FoundationsMain.activeHomePage = theRole;
 		
-		label_UserDetails.setText("User: " + theUser.getUserName());// Set the username
-
+		label_UserDetails.setText("User: " + theUser.getUserName());
+				
 		// Set the title for the window, display the page, and wait for the Admin to do something
-		theStage.setTitle("CSE 360 Foundations: Role2 Home Page");
-		theStage.setScene(theRole2HomeScene);						// Set this page onto the stage
-		theStage.show();											// Display it to the user
+		theStage.setTitle("CSE 360 Foundations: Contributor Home Page");
+		theStage.setScene(theViewContributorHomeScene);
+		theStage.show();
 	}
 	
 	/**********
-	 * <p> Method: ViewRole2Home() </p>
+	 * <p> Method: ViewContributorHome() </p>
 	 * 
 	 * <p> Description: This method initializes all the elements of the graphical user interface.
 	 * This method determines the location, size, font, color, and change and event handlers for
-	 * each GUI object. </p>
+	 * each GUI object.</p>
 	 * 
 	 * This is a singleton and is only performed once.  Subsequent uses fill in the changeable
-	 * fields using the displayRole2Home method.</p>
+	 * fields using the displayViewerHome method.</p>
 	 * 
 	 */
-	private ViewRole2Home() {
-		
+	private ViewContributorHome() {
+
 		// Create the Pane for the list of widgets and the Scene for the window
 		theRootPane = new Pane();
-		theRole2HomeScene = new Scene(theRootPane, width, height);	// Create the scene
+		theViewContributorHomeScene = new Scene(theRootPane, width, height);	// Create the scene
 		
 		// Set the title for the window
 		
 		// Populate the window with the title and other common widgets and set their static state
 		
 		// GUI Area 1
-		label_PageTitle.setText("Role2 Home Page");
+		label_PageTitle.setText("Contributor Home Page");
 		setupLabelUI(label_PageTitle, "Arial", 28, width, Pos.CENTER, 0, 5);
 
 		label_UserDetails.setText("User: " + theUser.getUserName());
 		setupLabelUI(label_UserDetails, "Arial", 20, width, Pos.BASELINE_LEFT, 20, 55);
 		
 		setupButtonUI(button_UpdateThisUser, "Dialog", 18, 170, Pos.CENTER, 610, 45);
-		button_UpdateThisUser.setOnAction((_) -> {ControllerRole2Home.performUpdate(); });
+		button_UpdateThisUser.setOnAction((_) -> {ControllerContributorHome.performUpdate(); });
 		
 		// GUI Area 2
 		
@@ -169,18 +170,18 @@ public class ViewRole2Home {
 		
 		// GUI Area 3
         setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
-        button_Logout.setOnAction((_) -> {ControllerRole2Home.performLogout(); });
+        button_Logout.setOnAction((_) -> {ControllerContributorHome.performLogout(); });
         
         setupButtonUI(button_Quit, "Dialog", 18, 250, Pos.CENTER, 300, 540);
-        button_Quit.setOnAction((_) -> {ControllerRole2Home.performQuit(); });
+        button_Quit.setOnAction((_) -> {ControllerContributorHome.performQuit(); });
 
 		// This is the end of the GUI initialization code
 		
 		// Place all of the widget items into the Root Pane's list of children
-        theRootPane.getChildren().addAll(
+         theRootPane.getChildren().addAll(
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
 	        line_Separator4, button_Logout, button_Quit);
-	}
+}
 	
 	
 	/*-********************************************************************************************

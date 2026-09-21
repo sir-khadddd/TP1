@@ -87,6 +87,13 @@ public class ControllerAdminHome {
 		String theSelectedRole = (String) ViewAdminHome.combobox_SelectRole.getValue();
 		String invitationCode = theDatabase.generateInvitationCode(emailAddress,
 				theSelectedRole);
+        // If the invitation could not be stored, do not show the user a code that is broken
+        if (invitationCode == null) {
+                ViewAdminHome.alertEmailError.setContentText(
+                                "The invitation could not be created.  Try again.");
+                ViewAdminHome.alertEmailError.showAndWait();
+                return;
+        }
 		String msg = "Code: " + invitationCode + " for role " + theSelectedRole + 
 				" was sent to: " + emailAddress;
 		System.out.println(msg);
