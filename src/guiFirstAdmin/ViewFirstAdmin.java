@@ -157,14 +157,16 @@ public class ViewFirstAdmin {
 		setupTextUI(text_AdminUsername, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 160, 
 				true);
 		text_AdminUsername.setPromptText("Enter Admin Username");
-		text_AdminUsername.textProperty().addListener((_, _, _) 
+		text_AdminUsername.textProperty().addListener((_, _, _)
 				-> {ControllerFirstAdmin.setAdminUsername(); });
 
 		// Establish the text input operand field for the password
 		setupTextUI(text_AdminPassword1, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 210, 
 				true);
 		text_AdminPassword1.setPromptText("Enter Admin Password");
-		// add comment
+		// This listener was adjusted to incorporate the passwordRequirementsDisplay using
+		// the updateRequirements method from passwordPopUpWindow's view which actively displays
+		// which requirements are passed (using color) as the user is typing
 		text_AdminPassword1.textProperty().addListener((_, _, _) 
 				-> { ControllerFirstAdmin.setAdminPassword1(); 
 				passwordPopUpWindow.View.updateRequirements(text_AdminPassword1.getText());
@@ -195,7 +197,8 @@ public class ViewFirstAdmin {
 				label_TitleLine2, text_AdminUsername, text_AdminPassword1, 
 				text_AdminPassword2, button_AdminSetup, label_PasswordsDoNotMatch,
 				button_Quit);
-		// add comment
+		// This is added so the password requirements are displayed to the user just below 
+		// where the password box is
 		passwordPopUpWindow.View.passwordRequirementDisplay(theRootPane, 50, 300, width);
 	}
 	

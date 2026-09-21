@@ -79,9 +79,20 @@ public class View {
 	static protected Label label_NotTooLong = new Label(); // added to represent when user enters overly long 
 														  // password (> 64 characters)
 
-	// needs comments
+	/*******
+	 * <p> Title: passwordRequirementDisplay - used by all GUIs that require a password
+	 * to be created.
+	 * </p>
+	 * 
+	 * <p> Description: This method displays the each of the password requirement labels
+	 * 	(label_UpperCase, label_LowerCase, label_NumericDigit, label_SpecialChar, label_LongEnough,
+	 *   label_NotTooLong) to the user, accounting for the positioning of the password box and 
+	 *   the width of the GUI display. These requirements are displayed in a list that drops down.
+	 *   This method takes a Pane parameter, and three double parameters.
+	 * 
+	 */
+	
 	public static void passwordRequirementDisplay(Pane theRoot, double x, double y, double windowWidth) {
-		Label title = new Label("A valid password contains:");
 		
 		setupLabelWidget(label_Requirements, x, y, "Arial", 16, windowWidth-10, 
 	    		Pos.BASELINE_LEFT);
@@ -110,7 +121,18 @@ public class View {
 	    updateRequirements("");
 	}
 	
-	// needs comments
+	/*******
+	 * <p> Title: updateRequirements - used by all GUIs to continuously show the user the 
+	 * 			specified requirements.
+	 * </p>
+	 * 
+	 * <p> Description: This method continuously displays the each of the password requirement to the user, 
+	 * 		updating whether the has or has not yet satisfied each requirement. This is done using the 
+	 * 		setRequirement private method that displays the requirement in green if it is satisfied, 
+	 * 		and red if not. This method takes the string parameter of password to compare it to the 
+	 * 		requirements in real time. 
+	 * 
+	 */
 	public static void updateRequirements(String password) {
 		boolean empty = password.isEmpty();
 		if (!empty) { 
@@ -132,7 +154,10 @@ public class View {
 		
 	}
 	
-	// needs comments
+	/*
+	 * Private local method to set text to green or red according to whether a requirement has
+	 * been fulfilled.
+	 */
 	private static void setRequirement(Label label, String text, boolean satisfied) {
 		if (satisfied) {
 			label.setText(text + " - Satisfied");
