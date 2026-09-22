@@ -2,12 +2,10 @@ package guiUserLogin;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -45,13 +43,14 @@ public class ViewUserLogin {
 	private static Label label_OperationalStartTitle = new Label("Log In or Invited User Account Setup ");
 	private static Label label_LogInInsrtuctions = new Label("Enter your user name and password and "+	
 			"then click on the LogIn button");
-	protected static Alert alertUsernamePasswordError = new Alert(AlertType.INFORMATION);
-
+	
 
 	//	private User user;
 	protected static TextField text_Username = new TextField();
 	protected static PasswordField text_Password = new PasswordField();
-	private static Button button_Login = new Button("Log In");	
+	private static Button button_Login = new Button("Log In");
+	//Inline error messages under the password field when a login attempt fails
+	protected static Label label_LoginError = new Label();
 
 	private static Label label_AccountSetupInsrtuctions = new Label("No account? "+	
 			"Enter your invitation code and click on the Account Setup button");
@@ -87,6 +86,7 @@ public class ViewUserLogin {
 		text_Username.setText("");		// Reset the username and password from the last use
 		text_Password.setText("");
 		text_Invitation.setText("");	// Same for the invitation code
+		label_LoginError.setText("");   //clear errors from previous attempts
 
 		// Set the title for the window, display the page, and wait for the Admin to do something
 		theStage.setTitle("CSE 360 Foundation Code: User Login Page");		
@@ -143,13 +143,15 @@ public class ViewUserLogin {
 		// Establish the text input operand field for the password
 		setupTextUI(text_Password, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 210, true);
 		text_Password.setPromptText("Enter Password");
+		//Use the shared error style so that all validation messages are the same style.
+		//Place the inline error message underneath the password field.
+		setupLabelUI(label_LoginError, "Arial", 12, 300, Pos.BASELINE_LEFT, 50, 250);
+		label_LoginError.getStyleClass().add("error-label");
 
 		// Set up the Log In button
 		setupButtonUI(button_Login, "Dialog", 18, 200, Pos.CENTER, 475, 180);
 		button_Login.setOnAction((_) -> {ControllerUserLogin.doLogin(theStage); });
 
-		alertUsernamePasswordError.setTitle("Invalid username/password!");
-		alertUsernamePasswordError.setHeaderText(null);
 
 
 		// The invitation to setup an account portion of the page
@@ -178,7 +180,7 @@ public class ViewUserLogin {
 				label_OperationalStartTitle,
 				label_LogInInsrtuctions, label_AccountSetupInsrtuctions, text_Username,
 				button_Login, text_Password, text_Invitation, button_SetupAccount,
-				button_Quit);
+				button_Quit, label_LoginError);
 	}
 
 

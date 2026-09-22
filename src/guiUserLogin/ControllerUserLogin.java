@@ -72,6 +72,7 @@ public class ControllerUserLogin {
 	 */	
 	protected static void doLogin(Stage ts) {
 		theStage = ts;
+		ViewUserLogin.label_LoginError.setText("");	// Clear the message from the last attempt
 		String username = ViewUserLogin.text_Username.getText();
 		String password = ViewUserLogin.text_Password.getText();
     	boolean loginResult = false;
@@ -80,9 +81,7 @@ public class ControllerUserLogin {
      	if (theDatabase.getUserAccountDetails(username) == false) {
      		// Don't provide too much information.  Don't say the username is invalid or the
      		// password is invalid.  Just say the pair is invalid.
-    		ViewUserLogin.alertUsernamePasswordError.setContentText(
-    				"Incorrect username/password. Try again!");
-    		ViewUserLogin.alertUsernamePasswordError.showAndWait();
+    		ViewUserLogin.label_LoginError.setText("Incorrect username or password."); //error message
     		return;
     	}
 		// System.out.println("*** Username is valid");
@@ -94,9 +93,7 @@ public class ControllerUserLogin {
         if (theDatabase.getCurrentOneTimePasswordFlag()) {
                 String oneTimePassword = theDatabase.getCurrentOneTimePassword();
                 if (oneTimePassword == null || password.compareTo(oneTimePassword) != 0) {
-                        ViewUserLogin.alertUsernamePasswordError.setContentText(
-                                        "Incorrect username/password. Try again!");
-                        ViewUserLogin.alertUsernamePasswordError.showAndWait();
+                    ViewUserLogin.label_LoginError.setText("Incorrect username or password."); //error message
                         return;
                 }
                 // The one time password was correct, so this requires a new password to be made
@@ -104,9 +101,7 @@ public class ControllerUserLogin {
                 return;
         }
         if (password.compareTo(actualPassword) != 0) {
-            ViewUserLogin.alertUsernamePasswordError.setContentText(
-                            "Incorrect username/password. Try again!");
-            ViewUserLogin.alertUsernamePasswordError.showAndWait();
+            ViewUserLogin.label_LoginError.setText("Incorrect username or password."); //error message
             return;
         }
 		
