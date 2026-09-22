@@ -142,7 +142,9 @@ public class ViewMultipleRoleDispatch {
 		// Create the Pane for the list of widgets and the Scene for the window
 		theRootPane = new Pane();
 		theMultipleRoleDispatchScene = new Scene(theRootPane, width, height);
-
+		// Attach team stylesheet so this screen matches the design that was agreed upon.
+		theRootPane.getStylesheets().add(
+			getClass().getResource("/applicationMain/application.css").toExternalForm());
 		// Populate the window with the title and other common widgets and set their static state
 		
 		// GUI Area 1

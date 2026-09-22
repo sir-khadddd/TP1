@@ -218,6 +218,9 @@ public class ViewUserUpdate {
 		theRootPane = new Pane();
 		theUserUpdateScene = new Scene(theRootPane, width, height);
 
+		// Attach team stylesheet so this screen matches the design that was agreed upon.
+		theRootPane.getStylesheets().add(
+			getClass().getResource("/applicationMain/application.css").toExternalForm());
 		// Initialize the pop-up dialogs to an empty text filed.
 		dialogUpdateFirstName = new TextInputDialog("");
 		dialogUpdateMiddleName = new TextInputDialog("");

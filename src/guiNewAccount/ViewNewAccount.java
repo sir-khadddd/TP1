@@ -167,6 +167,10 @@ public class ViewNewAccount {
 		theRootPane = new Pane();
 		theNewAccountScene = new Scene(theRootPane, width, height);
 
+		// Attach team stylesheet so this screen matches the design that was agreed upon.
+		theRootPane.getStylesheets().add(
+				getClass().getResource("/applicationMain/application.css").toExternalForm());
+		
 		// Label the Panle with the name of the startup screen, centered at the top of the pane
 		setupLabelUI(label_ApplicationTitle, "Arial", 28, width, Pos.CENTER, 0, 5);
 		
